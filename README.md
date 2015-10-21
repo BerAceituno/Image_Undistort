@@ -21,4 +21,6 @@ then you can run it by simply typing
   $ ./Calibracion <Input>
 ```
 
-where the input must be a .xml settings file (for an example check USB_Fotos.xml).
+where the input must be a .xml settings file (for an example check USB_PICS.xml).
+
+# Distributed under MIT License
