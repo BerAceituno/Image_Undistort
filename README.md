@@ -12,7 +12,7 @@ And has been succesfully tested on Ubuntu 14.04 and 12.04, no GPU required.
 
 # Installation
 
-* "Download dependencies"
+* **Download dependencies**
 
   To install CMake and Build-essentials enter your workspace and enter the following:
   
@@ -43,7 +43,7 @@ And has been succesfully tested on Ubuntu 14.04 and 12.04, no GPU required.
     $ sudo make install
   ```
 
-* "Cloning the repository and building"
+* **Cloning the repository and building**
 
   locate the terminal in your workspace folder and enter:
   
