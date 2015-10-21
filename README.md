@@ -61,7 +61,7 @@ And has been succesfully tested on Ubuntu 14.04 and 12.04, no GPU required.
 
 # Use
 
-then you can run it by simply typing
+The software is ran via terminal by locating in the build folder and entering:
 
 ```
   $ ./Calibracion <Input>
