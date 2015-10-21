@@ -15,7 +15,7 @@
 		To use an input camera -> give the ID of the camera, like "1"
 		To use an image list   -> give the path to the XML or YAML file containing the list of the images, like "/tmp/circles_list.xml"
 		-->
-  <Input>"Input/PICS.xml"</Input>
+  <Input>"PICS.xml"</Input>
   <!--  If true (non-zero) we flip the input images around the horizontal axis.-->
   <Input_FlipAroundHorizontalAxis>0</Input_FlipAroundHorizontalAxis>
   
@@ -23,7 +23,7 @@
   <Input_Delay>100</Input_Delay>	
   
   <!-- How many frames to use, for calibration. -->
-  <Calibrate_NrOfFrameToUse>25</Calibrate_NrOfFrameToUse>
+  <Calibrate_NrOfFrameToUse> 25 </Calibrate_NrOfFrameToUse>
   <!-- Consider only fy as a free parameter, the ratio fx/fy stays the same as in the input cameraMatrix. 
 	   Use or not setting. 0 - False Non-Zero - True-->
   <Calibrate_FixAspectRatio> 0 </Calibrate_FixAspectRatio>
@@ -39,7 +39,7 @@
   <!-- If true (non-zero) we write to the output file the extrinsic camera parameters.-->
   <Write_extrinsicParameters>1</Write_extrinsicParameters>
   <!-- If true (non-zero) we show after calibration the undistorted images.-->
-  <Show_UndistortedImage>1</Show_UndistortedImage>
+  <Show_UndistortedImage> 0 </Show_UndistortedImage>
  
 </Settings>
 </opencv_storage>
