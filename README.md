@@ -8,14 +8,17 @@ Camera calibration and parameter extraction software developed for the U.S.B. Me
 
 # Use
 
-locate the terminal in the source code folder and build by:
+locate the terminal in the source code folder and build by entering the following commands:
 
-$ cmake .
-
-$ make
+```
+  $ cmake . 
+  $ make
+```
 
 then you can run it by simply typing
 
-$ ./Calibracion <Input>
+```
+  $ ./Calibracion <Input>
+```
 
 where the input must be a .xml settings file (for an example check USB_Fotos.xml).
