@@ -48,7 +48,7 @@ then it is build by entering:
 locate the terminal in your workspace folder and enter:
 
 ```
-  $ git clone https://github.com/BerAceituno/Camera_Calibration
+  $ git clone https://github.com/BerAceituno/Camera_Calibration.git
 ```
 
 locate the terminal in the source code folder and build by entering the following commands:
