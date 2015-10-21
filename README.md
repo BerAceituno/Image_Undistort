@@ -11,6 +11,7 @@ Camera calibration and parameter extraction software developed for the U.S.B. Me
 locate the terminal in the source code folder and build by:
 
 $ cmake .
+
 $ make
 
 then you can run it by simply typing
