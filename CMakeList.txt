@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project( Calibracion )
+project( Undistort )
 find_package( OpenCV REQUIRED )
-add_executable( Calibracion Calibracion.cpp )
-target_link_libraries( Calibracion ${OpenCV_LIBS} )
+add_executable( Undistort Undistort.cpp )
+target_link_libraries( Undistort ${OpenCV_LIBS} )
