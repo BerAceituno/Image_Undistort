@@ -72,9 +72,9 @@ where the inputs are:
   1. argv[1] = a .xml file containing the intrinsic parameters of the camera in openCV format (*check PARAMETERS.xml for reference*).
   
   2. argv[2] = the source to undistort:
-        1.  Imagelist     =  an .xml containing a list of images in opencv format (*check IMAGELIST.xml for reference*)
-        2.  Video         =  the absolute of relative path of a video file in .avi or .TOD format.
-        3.  Single Image  =  the absolute of relative path of an image file.
+        a.  Imagelist     =  an .xml containing a list of images in opencv format (*check IMAGELIST.xml for reference*)
+        b.  Video         =  the absolute of relative path of a video file in .avi or .TOD format.
+        c.  Single Image  =  the absolute of relative path of an image file.
 
 The outputs have **generic sequential names** depending on the type of input and are saved on the path of the executable file, therefore is recommended to move every undistorted frame to another folder to avoid overwriting.
 
