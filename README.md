@@ -1,5 +1,5 @@
-# Camera Calibration
-Camera calibration and parameter extraction software developed for the U.S.B. Mechatronics Group.
+# Image Undistort
+Undistort from extracted parameters software developed for the U.S.B. Mechatronics Group.
 
 # Requirements
 
@@ -48,13 +48,13 @@ And has been succesfully tested on Ubuntu 14.04 and 12.04, no GPU required.
   locate the terminal in your workspace folder and enter:
   
   ```
-    $ git clone https://github.com/BerAceituno/Camera_Calibration.git
+    $ git clone https://github.com/BerAceituno/Image_Undistort.git
   ```
   
   locate the terminal in the source code folder and build by entering the following commands:
   
   ```
-    $ cd Camera_Calibration
+    $ cd Image_Undistort
     $ cmake . 
     $ make
   ```
@@ -64,9 +64,18 @@ And has been succesfully tested on Ubuntu 14.04 and 12.04, no GPU required.
 The software is ran via terminal by locating in the build folder and entering:
 
 ```
-  $ ./Calibracion <Input>
+  $ ./Undistort <Parameters .xml file> <source to undistort>
 ```
 
-where the input must be a .xml settings file (for an example check USB_PICS.xml).
+where the inputs are:
+
+  argv[1] = a .xml file containing the intrinsic parameters of the camera in openCV format (*check PARAMETERS.xml for reference*).
+  
+  argv[2] = the source to undistort:
+        *  Imagelist     =  an .xml containing a list of images in opencv format (*check imagelist.xml for reference*)
+        *  Video         =  the absolute of relative path of a video file in .avi or .TOD format.
+        *  Single Image  =  the absolute of relative path of an image file.
+
+The outputs have **generic sequential names** depending on the type of input and are saved on the path of the executable file, therefore is recommended to move every undistorted frame to another folder to avoid overwriting.
 
 **Distributed under an MIT License**
