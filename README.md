@@ -69,12 +69,13 @@ The software is ran via terminal by locating in the build folder and entering:
 
 where the inputs are:
 
-  argv[1] = a .xml file containing the intrinsic parameters of the camera in openCV format (*check PARAMETERS.xml for reference*).
+  1. argv[1] = a .xml file containing the intrinsic parameters of the camera in openCV format (*check PARAMETERS.xml for reference*).
   
-  argv[2] = the source to undistort:
-        *  Imagelist     =  an .xml containing a list of images in opencv format (*check IMAGELIST.xml for reference*)
-        *  Video         =  the absolute of relative path of a video file in .avi or .TOD format.
-        *  Single Image  =  the absolute of relative path of an image file.
+  2. argv[2] = the source to undistort:
+  
+        a.  Imagelist     =  an .xml containing a list of images in opencv format (*check IMAGELIST.xml for reference*)
+        b.  Video         =  the absolute of relative path of a video file in .avi or .TOD format.
+        c.  Single Image  =  the absolute of relative path of an image file.
 
 The outputs have **generic sequential names** depending on the type of input and are saved on the path of the executable file, therefore is recommended to move every undistorted frame to another folder to avoid overwriting.
 
