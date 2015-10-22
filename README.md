@@ -1,5 +1,5 @@
 # Image Undistort
-Undistort from extracted parameters software developed for the U.S.B. Mechatronics Group.
+Image and Video Undistort from extracted parameters software developed for the U.S.B. Mechatronics Group.
 
 # Requirements
 
