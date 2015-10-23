@@ -1,6 +1,6 @@
 /*********************************************************************/
 /* File: Undistort.cpp                                               */
-/* Last Edition: 14/10/2015, 01:54 PM.                               */
+/* Last Edition: 23/10/2015, 17:34 PM.                               */
 /*********************************************************************/
 /* Programmed by:                                                    */
 /* Bernardo Aceituno C                                               */
@@ -14,9 +14,6 @@
 #include <iostream>
 #include <sstream>
 #include <stdio.h>
-#include <time.h>
-
-#include <boost/filesystem.hpp>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -57,14 +54,17 @@ int main(int argc, char* argv[]){
     //declares the image dimensions
     int width, height;
 
-    //reads the time
-    time_t tm;
-    time( &tm );
-    struct tm *t2 = localtime( &tm );
-    char t3[1024];
-    strftime(t3, sizeof(t3)-1, "%x%X", t2);
+    if(argv[2]=="-h"){
+        cout << "Help:" << endl;
+        cout << "argv[1]: calibration .XML in OpenCV format." << endl;
+        cout << "argv[2]: Input source" << endl;
+        cout << "     .xml: assumed for imagelist" << endl; 
+        cout << "     .avi: for video (testing)" << endl;
+        cout << "         : other formats will be assumed for image" << endl; 
+        cout << "argv[3]: Output file [optional]" << endl;
 
-    const string time_str = string(t3);
+        return 0;
+    }
 
     //determines if the two inputs arguments are given
     if(argc < 3){
@@ -84,18 +84,6 @@ int main(int argc, char* argv[]){
     }
     else{
 	BasePath = string("");
-    }
-
-    if(argv[2]=="-h"){
-        cout << "Help:" << endl;
-        cout << "argv[1]: calibration .XML in OpenCV format." << endl;
-        cout << "argv[2]: Input source" << endl;
-        cout << "     .xml: assumed for imagelist" << endl; 
-        cout << "     .avi: for video (testing)" << endl;
-        cout << "         : other formats will be assumed for image" << endl; 
-        cout << "argv[3]: Output file [optional]" << endl;
-
-        return 0;
     }
 
     //reads the .xml file
