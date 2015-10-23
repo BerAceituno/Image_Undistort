@@ -4,7 +4,7 @@
 /*********************************************************************/
 /* Programmed by:                                                    */
 /* Bernardo Aceituno C                                               */
-/* Jose Cappelletto						     */
+/* Jose Cappelletto												     */
 /*********************************************************************/
 /*Image undistort program, takes the Output .XML and the source as   */
 /*inputs and outputs the undistorted source (image, list or video    */
@@ -246,8 +246,14 @@ int main(int argc, char* argv[]){
         initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
         remap(image, Output, map1, map2, INTER_LINEAR);
 
+        string imagefilename = InputFilename.substr(InputFilename.find_last_of("/") + 1,InputFilename.length() - 4);
+
+        ostringstream outname;
+
+        outname << BasePath << "REMAP_" << imagefilename << ".jpg";
+
         //saves the calibrated frame
-        bool save = imwrite(BasePath+"REMAP_"+InputFilename, Output, compression_params);
+        bool save = imwrite(outname.str(), Output, compression_params);
 
         //checks if it was saved correctly
         if(!(save)){
