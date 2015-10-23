@@ -76,6 +76,6 @@ where the inputs are:
         2.1.  Imagelist     =  an .xml containing a list of images in opencv format (*check IMAGELIST.xml for reference*)
         2.2.  Video         =  the absolute of relative path of a video file in .avi format.
         2.3.  Single Image  =  the absolute of relative path of an image file.
-  3. argv[3]  = (optional) the output directory, imagefiles will be saved to the direcotyry given, its important to                    remember that the path must be already created or else the saving process will fail.
+  3. argv[3]  = (optional) the output directory, imagefiles will be saved to the directory given, its important to                    remember that the path must be already created or else the saving process will fail.
 
 **Distributed under an MIT License**
