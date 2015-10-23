@@ -64,19 +64,18 @@ And has been succesfully tested on Ubuntu 14.04 and 12.04, no GPU required.
 The software is ran via terminal by locating in the build folder and entering:
 
 ```
-  $ ./Undistort <Parameters .xml file> <source to undistort>
+  $ ./Undistort <Parameters .xml file> <source to undistort> <(Optional) Output directory>
 ```
 
 where the inputs are:
 
-  1. argv[1] = a .xml file containing the intrinsic parameters of the camera in openCV format (*check PARAMETERS.xml for reference*).
+  1. argv[1]  = a .xml file containing the intrinsic parameters of the camera in openCV format (*check PARAMETERS.xml for reference*).
   
-  2. argv[2] = the source to undistort:
+  2. argv[2]  = the source to undistort:
         
         2.1.  Imagelist     =  an .xml containing a list of images in opencv format (*check IMAGELIST.xml for reference*)
         2.2.  Video         =  the absolute of relative path of a video file in .avi or .TOD format.
         2.3.  Single Image  =  the absolute of relative path of an image file.
-
-The outputs have **generic sequential names** depending on the type of input and are saved on the path of the executable file, therefore is recommended to move every undistorted frame to another folder to avoid overwriting.
+  3. argv[3]  = (optional) the output directory, imagefiles will be saved to the direcotyry given, its important to                    remember that the path must be already created or else the saving process will fail.
 
 **Distributed under an MIT License**
