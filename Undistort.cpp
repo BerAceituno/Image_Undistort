@@ -1,10 +1,10 @@
 /*********************************************************************/
 /* File: Undistort.cpp                                               */
-/* Last Edition: 23/10/2015, 17:34 PM.                               */
+/* Last Edition: 23/10/2015, 17:45 PM.                               */
 /*********************************************************************/
 /* Programmed by:                                                    */
 /* Bernardo Aceituno C                                               */
-/* Jose Cappelletto												     */
+/* Jose Cappelletto						     */
 /*********************************************************************/
 /*Image undistort program, takes the Output .XML and the source as   */
 /*inputs and outputs the undistorted source (image, list or video    */
@@ -247,7 +247,7 @@ int main(int argc, char* argv[]){
         remap(image, Output, map1, map2, INTER_LINEAR);
 
         //saves the calibrated frame
-        bool save = imwrite("REMAP_"+InputFilename, Output, compression_params);
+        bool save = imwrite(BasePath+"REMAP_"+InputFilename, Output, compression_params);
 
         //checks if it was saved correctly
         if(!(save)){
