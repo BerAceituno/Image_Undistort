@@ -4,7 +4,7 @@
 /*********************************************************************/
 /* Programmed by:                                                    */
 /* Bernardo Aceituno C                                               */
-/* Jose Cappelletto						     */
+/* Jose Cappelletto												     */
 /*********************************************************************/
 /*Image undistort program, takes the Output .XML and the source as   */
 /*inputs and outputs the undistorted source (image, list or video    */
@@ -54,7 +54,7 @@ int main(int argc, char* argv[]){
     //declares the image dimensions
     int width, height;
 
-    if(argv[2]=="-h"){
+    if(string(argv[1])=="-h"){
         cout << "Help:" << endl;
         cout << "argv[1]: calibration .XML in OpenCV format." << endl;
         cout << "argv[2]: Input source" << endl;
