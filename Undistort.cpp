@@ -4,6 +4,7 @@
 /*********************************************************************/
 /* Programmed by:                                                    */
 /* Bernardo Aceituno C                                               */
+/* Jose Cappelletto						     */
 /*********************************************************************/
 /*Image undistort program, takes the Output .XML and the source as   */
 /*inputs and outputs the undistorted source (image, list or video    */
@@ -13,6 +14,9 @@
 #include <iostream>
 #include <sstream>
 #include <stdio.h>
+#include <time.h>
+
+#include <boost/filesystem.hpp>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -27,8 +31,9 @@ using namespace cv;
 using namespace std;
 
 bool readStringList( const string& filename, vector<string>& l){
+
     l.clear();
-    
+
     FileStorage fs(filename, FileStorage::READ);
     
     if( !fs.isOpened() ) return false;
@@ -46,26 +51,49 @@ bool readStringList( const string& filename, vector<string>& l){
 
 int main(int argc, char* argv[]){
 	
-    //declares the camera coeffiient arrays
+    //declares the camera coefficient arrays
     Mat cameraMatrix, distCoeffs;
 
-    //declarres the image dimensions
+    //declares the image dimensions
     int width, height;
 
-    //determines if the two inputs are given
+    //reads the time
+    time_t tm;
+    time( &tm );
+    struct tm *t2 = localtime( &tm );
+    char t3[1024];
+    strftime(t3, sizeof(t3)-1, "%x%X", t2);
+
+    const string time_str = string(t3);
+
+    //determines if the two inputs arguments are given
     if(argc < 3){
-        cout << "Error! wrong or no input!" << endl;
-        cout << "HELP: argv[1] is the .XML file and argv[2] is the source imagefile" << endl;
+        cout << "Error! wrong or no input provided!" << endl;
+        cout << "Usage: > Undistort calibration_file file_input file_output" << endl;
+        cout << "HELP: argv[1] is the .XML calibration file" << endl;
+        cout << "      argv[2] is the source imagefile" << endl;
+        cout << "      argv[3] is the output imagefile" << endl;
+        cout << "See -h option for further details" << endl;
         return -1;
+    }
+
+	//checks if an output path has been provided
+    string BasePath;
+    if(argc == 4){
+	BasePath = string(argv[3]);
+    }
+    else{
+	BasePath = string("");
     }
 
     if(argv[2]=="-h"){
         cout << "Help:" << endl;
-        cout << "argv[1]: calibration .XML in opencv format." << endl;
+        cout << "argv[1]: calibration .XML in OpenCV format." << endl;
         cout << "argv[2]: Input source" << endl;
         cout << "     .xml: assumed for imagelist" << endl; 
         cout << "     .avi: for video (testing)" << endl;
         cout << "         : other formats will be assumed for image" << endl; 
+        cout << "argv[3]: Output file [optional]" << endl;
 
         return 0;
     }
@@ -100,7 +128,7 @@ int main(int argc, char* argv[]){
         bool readed = readStringList(InputFilename, imageList);
 
         if(!readed){
-            cout << "failed to open list" << endl;
+            cout << "Failed to open image list" << endl;
         }
 
         //declares the matrix for the current image
@@ -127,19 +155,29 @@ int main(int argc, char* argv[]){
             initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
             remap(image, Output, map1, map2, INTER_LINEAR);
 
-            //saves the remaped file
-            ostringstream namefr;
-            namefr << "REMAP_Image_" << atImageList << ".jpg";
-            bool save = imwrite(namefr.str(), Output, compression_params);
+            //gets the name of the original file
+	    	string fullpath = imageList[atImageList];
+	    	string filename = fullpath.substr(fullpath.find_last_of("/") + 1,fullpath.length() - 4);
 
-            //checks if the image was saved correctly;
+	    	ostringstream Namefr;
+
+
+	    	if(filename.empty()) Namefr << "ŔEMAP_" << fullpath;
+	    	else Namefr << BasePath << "ŔEMAP_" << filename;
+
+	    	//saves the undistorted file
+			bool save = imwrite(Namefr.str(), Output, compression_params);
+  
+          	//checks if the image was saved correctly;
             if(!(save)){
-                cout << "Image could not be saved" << endl;
+                cout << "Frame could not be saved" << endl;
                 return -1;
             }
 
             //loads the next image
             image = imread(imageList[atImageList++], CV_LOAD_IMAGE_COLOR);
+
+	    	//cout << "image " << atImageList << " done!" << endl; 
         }
     }
     else if(filetype == ".avi"){
@@ -158,6 +196,9 @@ int main(int argc, char* argv[]){
         //reads the first fream
         bool bSuccess = Video.read(image);
 
+        //gets the name of the input
+        string videoname = InputFilename.substr(InputFilename.find_last_of("/") + 1,InputFilename.length() - 4);
+        
         //declares a counter
         int cnt = 0;
 
@@ -180,12 +221,12 @@ int main(int argc, char* argv[]){
 
             //saves the remaped frame
             ostringstream namevidefr;
-            namevidefr << "REMAP_VIDEO_" << cnt << ".jpg";
+            namevidefr << BasePath << "REMAP_" << videoname << "_" << cnt << ".jpg";
             bool save = imwrite(namevidefr.str(), Output, compression_params);
 
             //checks if the image was saved correctly;
             if(!(save)){
-                cout << "Image could not be saved" << endl;
+                cout << "video frame could not be saved" << endl;
                 return -1;
             }
 
