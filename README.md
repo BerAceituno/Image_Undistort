@@ -77,5 +77,7 @@ where the inputs are:
         2.2.  Video         =  the absolute of relative path of a video file in .avi format.
         2.3.  Single Image  =  the absolute of relative path of an image file.
   3. argv[3]  = (optional) the output directory, imagefiles will be saved to the directory given, its important to                    remember that the path must be already created or else the saving process will fail.
+  
+  In the case the output directory is not specified the outputs frames will be saved in the source directory.
 
 **Distributed under an MIT License**
