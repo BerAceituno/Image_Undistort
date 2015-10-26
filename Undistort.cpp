@@ -4,7 +4,7 @@
 /*********************************************************************/
 /* Programmed by:                                                    */
 /* Bernardo Aceituno C                                               */
-/* Jose Cappelletto												     */
+/* Jose Cappelletto                                                  */
 /*********************************************************************/
 /*Image undistort program, takes the Output .XML and the source as   */
 /*inputs and outputs the undistorted source (image, list or video    */
@@ -47,12 +47,17 @@ bool readStringList( const string& filename, vector<string>& l){
 }
 
 int main(int argc, char* argv[]){
-	
+    
     //declares the camera coefficient arrays
     Mat cameraMatrix, distCoeffs;
 
     //declares the image dimensions
     int width, height;
+
+    if(argc < 2){
+        cout << "ERROR!: No arguments passed!" << endl;
+        return -1;
+    }
 
     if(string(argv[1])=="-h"){
         cout << "Help:" << endl;
@@ -77,21 +82,20 @@ int main(int argc, char* argv[]){
         return -1;
     }
 
-	//checks if an output path has been provided
+    //reads the path of the list
+    //string basepath_input = string(argv[2]).substr(string(argv[2]),string(arg[2]).length - string(arg[2]).substr(find_last_of("/")+1).length);
+
+    //checks if an output path has been provided
     string BasePath;
-    if(argc == 4){
-	BasePath = string(argv[3]);
-    }
-    else{
-	BasePath = string("");
-    }
+    if(argc == 4) BasePath = string(argv[3]);
+    else BasePath = string("")/*basepath_input*/;
 
     //reads the .xml file
     const string CoeffFilename = argv[1];
     FileStorage f(CoeffFilename,FileStorage::READ); 
 
     //declares the name of the output
-    const string InputFilename = argv[2];;   
+    const string InputFilename = argv[2];   
 
     //reads the data form the input
     f["Camera_Matrix"] >> cameraMatrix;
@@ -117,6 +121,7 @@ int main(int argc, char* argv[]){
 
         if(!readed){
             cout << "Failed to open image list" << endl;
+            return -1;
         }
 
         //declares the matrix for the current image
@@ -144,28 +149,25 @@ int main(int argc, char* argv[]){
             remap(image, Output, map1, map2, INTER_LINEAR);
 
             //gets the name of the original file
-	    	string fullpath = imageList[atImageList];
-	    	string filename = fullpath.substr(fullpath.find_last_of("/") + 1,fullpath.length() - 4);
+            string fullpath = imageList[atImageList];
+            string filename = fullpath.substr(fullpath.find_last_of("/") + 1,fullpath.length() - 4);
 
-	    	ostringstream Namefr;
+            ostringstream Namefr;
+            if(filename.empty()) Namefr << "REMAP_" << fullpath;
+            else Namefr << BasePath << "REMAP_" << filename;
 
-
-	    	if(filename.empty()) Namefr << "ŔEMAP_" << fullpath;
-	    	else Namefr << BasePath << "ŔEMAP_" << filename;
-
-	    	//saves the undistorted file
-			bool save = imwrite(Namefr.str(), Output, compression_params);
+            //saves the undistorted file
+            bool save = imwrite(Namefr.str(), Output, compression_params);
   
-          	//checks if the image was saved correctly;
+            //checks if the image was saved correctly;
             if(!(save)){
                 cout << "Frame could not be saved" << endl;
                 return -1;
             }
-
+            
+            cout << "image " << atImageList << " from imagelist done!" << endl; 
             //loads the next image
             image = imread(imageList[atImageList++], CV_LOAD_IMAGE_COLOR);
-
-	    	//cout << "image " << atImageList << " done!" << endl; 
         }
     }
     else if(filetype == ".avi"){
@@ -174,6 +176,8 @@ int main(int argc, char* argv[]){
             cout << "Video could not be opened!" << endl;
             return -1;
         }
+
+        char number[10];
 
         //declares the variable for each frame
         Mat image;
@@ -192,7 +196,7 @@ int main(int argc, char* argv[]){
 
         while(!image.empty()){
             if(!bSuccess){
-                cout << "error with the frame" << endl;
+                cout << "error with the video frame" << endl;
                 return -1;
             }
 
@@ -209,7 +213,8 @@ int main(int argc, char* argv[]){
 
             //saves the remaped frame
             ostringstream namevidefr;
-            namevidefr << BasePath << "REMAP_" << videoname << "_" << cnt << ".jpg";
+            namevidefr << BasePath << "REMAP_" << videoname << "_" <</*setw(4) <<*/ cnt << ".jpg";
+            
             bool save = imwrite(namevidefr.str(), Output, compression_params);
 
             //checks if the image was saved correctly;
