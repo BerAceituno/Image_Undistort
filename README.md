@@ -64,20 +64,25 @@ And has been succesfully tested on Ubuntu 14.04 and 12.04, no GPU required.
 The software is ran via terminal by locating in the build folder and entering:
 
 ```
-  $ ./Undistort <Parameters .xml file> <source to undistort> <(Optional) Output directory>
+  $ ./Undistort -c  <calibration parameters .xml> -i <input source> -o <output directory> -p <prefix for output files> -r <sampling rate for video files>
 ```
 
-where the inputs are:
+where the inputs represent:
 
-  1. argv[1]  = a .xml file containing the intrinsic parameters of the camera in openCV format (*check PARAMETERS.xml for reference*).
+  1. -c   :   an .xml file with the intrinsic calibration parameters of the camera in openCv format.
   
-  2. argv[2]  = the source to undistort:
+  2. -i   :   the source to undistort it can be:
         
         2.1.  Imagelist     =  an .xml containing a list of images in opencv format (*check IMAGELIST.xml for reference*)
         2.2.  Video         =  the absolute of relative path of a video file in .avi format.
         2.3.  Single Image  =  the absolute of relative path of an image file.
-  3. argv[3]  = (optional) the output directory, imagefiles will be saved to the directory given, its important to                    remember that the path must be already created or else the saving process will fail.
+
+  3. -o   :   (optional) the output directory, imagefiles will be saved to the directory given, otherwise the output will be                saved in the directory of th source files.
   
-  In the case the output directory is not specified the outputs frames will be saved in the source directory.
+  4. -p   :   (optional) prefix for output files the output file these will be called %prefix%%filename%.jpg, if not given it               will be set to UND_.
+  
+  5. -r   :   (optional) sampling rate for video inputs, if not given it will be set to 1; 
+  
+  In the case the output directory is not created the saving process will fail.
 
 **Distributed under an MIT License**
