@@ -1,6 +1,6 @@
 /*********************************************************************/
 /* File: Undistort.cpp                                               */
-/* Last Edition: 23/10/2015, 17:45 PM.                               */
+/* Last Edition: 26/10/2015, 19:50 PM.                               */
 /*********************************************************************/
 /* Programmed by:                                                    */
 /* Bernardo Aceituno C                                               */
@@ -14,6 +14,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdio.h>
+#include <string>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -46,56 +47,105 @@ bool readStringList( const string& filename, vector<string>& l){
     return true;
 }
 
+void error(){
+    cout << "Error! wrong or no input provided!" << endl;
+    cout << "See -h option for further details" << endl;    
+}
+
+void help(){
+    cout << "Help: the input arguments shall be entered the following way" << endl;
+    cout << "-c : calibration .XML in OpenCV format." << endl;
+    cout << "-i : Input source" << endl;
+    cout << "     .xml: assumed for imagelist" << endl; 
+    cout << "     .avi: for video (testing)" << endl;
+    cout << "         : other formats will be assumed for image" << endl; 
+    cout << "-o : Output path [optional], if not given set as the input source directory" << endl;
+    cout << "-p : Output prefix [optional] if not given set as UND" << endl;
+    cout << "-r : video sampling rate [optional] if not given set as 1" << endl;
+    cout << endl;
+    cout << "example: " << endl;
+    cout << "$ ./Undistort -c CALIBRATION.xml -i VIDEO.avi -o /home/user/Documents/ -r 5 -p REMAP_" << endl;            
+}
+
+int str2int(const std::string& str) {
+
+    // Still need to add error checking 
+    int i = 0;
+    string::const_iterator it = str.begin();
+    while (it != str.end()) {
+        i *= 10;
+        i += *it++ - '0';
+    }
+
+    return i;
+}
+
 int main(int argc, char* argv[]){
     
+    //verifies that at least one argument is given
+    if(argc < 2){
+        error();
+        return -1;
+    }
+
+    //displays the help if required
+    if(string(argv[1])=="-h"){
+        help();
+        return 0;
+    }
+
+    //determines if the two minimum inputs arguments are given
+    if(argc < 3){
+        error();
+        return -1;
+    }
+
     //declares the camera coefficient arrays
     Mat cameraMatrix, distCoeffs;
 
     //declares the image dimensions
     int width, height;
 
-    if(argc < 2){
-        cout << "ERROR!: No arguments passed!" << endl;
-        return -1;
-    }
-
-    if(string(argv[1])=="-h"){
-        cout << "Help:" << endl;
-        cout << "argv[1]: calibration .XML in OpenCV format." << endl;
-        cout << "argv[2]: Input source" << endl;
-        cout << "     .xml: assumed for imagelist" << endl; 
-        cout << "     .avi: for video (testing)" << endl;
-        cout << "         : other formats will be assumed for image" << endl; 
-        cout << "argv[3]: Output file [optional]" << endl;
-
-        return 0;
-    }
-
-    //determines if the two inputs arguments are given
-    if(argc < 3){
-        cout << "Error! wrong or no input provided!" << endl;
-        cout << "Usage: > Undistort calibration_file file_input file_output" << endl;
-        cout << "HELP: argv[1] is the .XML calibration file" << endl;
-        cout << "      argv[2] is the source imagefile" << endl;
-        cout << "      argv[3] is the output imagefile" << endl;
-        cout << "See -h option for further details" << endl;
-        return -1;
-    }
-
-    //reads the path of the list
-    //string basepath_input = string(argv[2]).substr(string(argv[2]),string(arg[2]).length - string(arg[2]).substr(find_last_of("/")+1).length);
-
-    //checks if an output path has been provided
+    //declares the input files
+    string CoeffFilename;
+    string InputFilename;
     string BasePath;
-    if(argc == 4) BasePath = string(argv[3]);
-    else BasePath = string("")/*basepath_input*/;
 
-    //reads the .xml file
-    const string CoeffFilename = argv[1];
+    //reads the inputs
+    int i;
+    int fr = 1;
+    string argument, prefix, argval;
+    
+    //reads over each argument to get the inputs
+    for(i=1;i<argc - 1;i++){
+        //reads the argument
+        argument = string(argv[i]);
+        //parses the argument
+        argval = string(argv[i+1]);
+        //verifies the prefix of the argument to assign it
+        if(argument == "-i") InputFilename = argval;
+        if(argument == "-c") CoeffFilename = argval;
+        if(argument == "-o") BasePath = argval;
+        if(argument == "-p") prefix = argval;
+        if(argument == "-r") fr = str2int(argval);
+    }
+
+    //checks that the coefficients and the input source are given
+    if(InputFilename.empty() || CoeffFilename.empty() || InputFilename.length() == 2 || CoeffFilename.length() == 2){
+        cout << "Error! wrong or no input provided!" << endl;
+        cout << "Set -h as first parameter for further details" << endl;
+        return -1;
+    }
+
+    //gets the path of the input source
+    string filelen = InputFilename.substr(InputFilename.find_last_of("/")+1);
+    string basepath_input = InputFilename.substr(InputFilename.length(),InputFilename.length() - filelen.length());
+    //if there is no output path given the path of the source is taken as output file
+    if(BasePath.empty()) BasePath = basepath_input;
+    if(prefix.empty()) prefix = "UND_";
+
+    //opens the coefficients file
     FileStorage f(CoeffFilename,FileStorage::READ); 
-
-    //declares the name of the output
-    const string InputFilename = argv[2];   
 
     //reads the data form the input
     f["Camera_Matrix"] >> cameraMatrix;
@@ -118,7 +168,8 @@ int main(int argc, char* argv[]){
 
         //reads the imagelist
         bool readed = readStringList(InputFilename, imageList);
-
+        
+        //checks that the list was oppened succesfully
         if(!readed){
             cout << "Failed to open image list" << endl;
             return -1;
@@ -150,11 +201,16 @@ int main(int argc, char* argv[]){
 
             //gets the name of the original file
             string fullpath = imageList[atImageList];
-            string filename = fullpath.substr(fullpath.find_last_of("/") + 1,fullpath.length() - 4);
+
+            //reads the extension
+            string extension = fullpath.substr(fullpath.find_last_of("."));
+
+            //gets the filename
+            string filename = fullpath.substr(fullpath.find_last_of("/") + 1,fullpath.length() - extension.length());
 
             ostringstream Namefr;
-            if(filename.empty()) Namefr << "REMAP_" << fullpath;
-            else Namefr << BasePath << "REMAP_" << filename;
+            if(filename.empty()) Namefr << prefix << fullpath;
+            else Namefr << BasePath << prefix << filename;
 
             //saves the undistorted file
             bool save = imwrite(Namefr.str(), Output, compression_params);
@@ -206,21 +262,26 @@ int main(int argc, char* argv[]){
             //declares the outputs
             Mat Output(width, height, CV_16UC3, Scalar(0,50000, 50000));
             
-            //remaps the input
-            Mat map1, map2;
-            initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
-            remap(image, Output, map1, map2, INTER_LINEAR);
+            //check that the rate is the specified
+            if(cnt%fr==0){
+                //remaps the input
+                Mat map1, map2;
+                initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
+                remap(image, Output, map1, map2, INTER_LINEAR);
 
-            //saves the remaped frame
-            ostringstream namevidefr;
-            namevidefr << BasePath << "REMAP_" << videoname << "_" <</*setw(4) <<*/ cnt << ".jpg";
-            
-            bool save = imwrite(namevidefr.str(), Output, compression_params);
+                //saves the remaped frame
+                ostringstream namevidefr;
+                namevidefr << BasePath << prefix << videoname << "_" << cnt;
+                
+                bool save = imwrite(namevidefr.str(), Output, compression_params);
 
-            //checks if the image was saved correctly;
-            if(!(save)){
-                cout << "video frame could not be saved" << endl;
-                return -1;
+                //checks if the image was saved correctly;
+                if(!(save)){
+                    cout << "video frame could not be saved" << endl;
+                    return -1;
+                }
+
+                cout << "Frame " << cnt << " saved!" << endl;
             }
 
             //reads the next image
@@ -232,7 +293,7 @@ int main(int argc, char* argv[]){
     }
     else{
         //reads the image
-        Mat image = imread(argv[2],CV_LOAD_IMAGE_UNCHANGED);
+        Mat image = imread(InputFilename,CV_LOAD_IMAGE_UNCHANGED);
 
         //checks if the image is empty
         if(image.empty()){
@@ -251,13 +312,13 @@ int main(int argc, char* argv[]){
         initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
         remap(image, Output, map1, map2, INTER_LINEAR);
 
-        string imagefilename = InputFilename.substr(InputFilename.find_last_of("/") + 1,InputFilename.length() - 4);
+        string extension = InputFilename.substr(InputFilename.find_last_of("."));
+        string imagefilename = InputFilename.substr(InputFilename.find_last_of("/") + 1,InputFilename.length() - extension.length());
 
         ostringstream outname;
 
-        outname << BasePath << "REMAP_" << imagefilename << ".jpg";
-
-        //saves the calibrated frame
+        outname << BasePath << prefix << imagefilename;
+	    //saves the calibrated frame
         bool save = imwrite(outname.str(), Output, compression_params);
 
         //checks if it was saved correctly
