@@ -209,8 +209,8 @@ int main(int argc, char* argv[]){
             string filename = fullpath.substr(fullpath.find_last_of("/") + 1,fullpath.length() - extension.length());
 
             ostringstream Namefr;
-            if(filename.empty()) Namefr << prefix << fullpath;
-            else Namefr << BasePath << prefix << filename;
+            if(filename.empty()) Namefr << prefix << fullpath << ".jpg";
+            else Namefr << BasePath << prefix << filename << ".jpg";
 
             //saves the undistorted file
             bool save = imwrite(Namefr.str(), Output, compression_params);
@@ -271,7 +271,7 @@ int main(int argc, char* argv[]){
 
                 //saves the remaped frame
                 ostringstream namevidefr;
-                namevidefr << BasePath << prefix << videoname << "_" << cnt;
+                namevidefr << BasePath << prefix << videoname << "_" << cnt << ".jpg";
                 
                 bool save = imwrite(namevidefr.str(), Output, compression_params);
 
@@ -317,7 +317,7 @@ int main(int argc, char* argv[]){
 
         ostringstream outname;
 
-        outname << BasePath << prefix << imagefilename;
+        outname << BasePath << prefix << imagefilename << ".jpg";
 	    //saves the calibrated frame
         bool save = imwrite(outname.str(), Output, compression_params);
 
