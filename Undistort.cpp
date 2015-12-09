@@ -1,6 +1,6 @@
 /*********************************************************************/
 /* File: Undistort.cpp                                               */
-/* Last Edition: 26/10/2015, 19:50 PM.                               */
+/* Last Edition: 09/12/2015, 20:28 PM.                               */
 /*********************************************************************/
 /* Programmed by:                                                    */
 /* Bernardo Aceituno C                                               */
@@ -14,7 +14,7 @@
 #include <iostream>
 #include <sstream>
 #include <stdio.h>
-#include <string>
+#include <string.h>
 
 #include <opencv2/core/core.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -62,14 +62,16 @@ void help(){
     cout << "-o : Output path [optional], if not given set as the input source directory" << endl;
     cout << "-p : Output prefix [optional] if not given set as UND" << endl;
     cout << "-r : video sampling rate [optional] if not given set as 1" << endl;
+    cout << "-v : creating a video output [optional]" << endl;
     cout << endl;
     cout << "example: " << endl;
-    cout << "$ ./Undistort -c CALIBRATION.xml -i VIDEO.avi -o /home/user/Documents/ -r 5 -p REMAP_" << endl;            
+    cout << "$ ./Undistort -c CALIBRATION.xml -i VIDEO.avi -o /home/user/Documents/ -r 5 -p REMAP_ -v" << endl;            
 }
 
-int str2int(const std::string& str) {
+int str2int(const string& str) {
 
     // Still need to add error checking 
+
     int i = 0;
     string::const_iterator it = str.begin();
     while (it != str.end()) {
@@ -110,6 +112,7 @@ int main(int argc, char* argv[]){
     string CoeffFilename;
     string InputFilename;
     string BasePath;
+    int videoyes = 0;
 
     //reads the inputs
     int i;
@@ -124,10 +127,11 @@ int main(int argc, char* argv[]){
         argval = string(argv[i+1]);
         //verifies the prefix of the argument to assign it
         if(argument == "-i") InputFilename = argval;
-        if(argument == "-c") CoeffFilename = argval;
-        if(argument == "-o") BasePath = argval;
-        if(argument == "-p") prefix = argval;
-        if(argument == "-r") fr = str2int(argval);
+        else if(argument == "-c") CoeffFilename = argval;
+        else if(argument == "-o") BasePath = argval;
+        else if(argument == "-p") prefix = argval;
+        else if(argument == "-r") fr = str2int(argval);
+        else if(argument == "-v") videoyes = 1;
     }
 
     //checks that the coefficients and the input source are given
@@ -168,7 +172,7 @@ int main(int argc, char* argv[]){
 
         //reads the imagelist
         bool readed = readStringList(InputFilename, imageList);
-        
+
         //checks that the list was oppened succesfully
         if(!readed){
             cout << "Failed to open image list" << endl;
@@ -227,13 +231,12 @@ int main(int argc, char* argv[]){
         }
     }
     else if(filetype == ".avi"){
+        
         VideoCapture Video(InputFilename);
         if(!Video.isOpened()){
             cout << "Video could not be opened!" << endl;
             return -1;
         }
-
-        char number[10];
 
         //declares the variable for each frame
         Mat image;
@@ -244,9 +247,28 @@ int main(int argc, char* argv[]){
         //reads the first fream
         bool bSuccess = Video.read(image);
 
+        //gets the image size
+        imageSize = image.size();
+
         //gets the name of the input
         string videoname = InputFilename.substr(InputFilename.find_last_of("/") + 1,InputFilename.length() - 4);
         
+        //creates a video writer
+        VideoWriter videowr;
+
+        //creates a new video if requested
+        if(videoyes){
+            //creates the output name
+            ostringstream Out_videoname;
+            Out_videoname << BasePath << prefix << videoname << ".avi";
+            //initializes the writer
+            videowr.open(Out_videoname.str(), CV_FOURCC('P','I','M','1'), 30, imageSize, true);
+            if (!videowr.isOpened()){
+                cout << "error: failed to write the video" << endl;
+                return -1;
+            }
+        }
+
         //declares a counter
         int cnt = 0;
 
@@ -255,33 +277,34 @@ int main(int argc, char* argv[]){
                 cout << "error with the video frame" << endl;
                 return -1;
             }
-
-            //gets the image size
-            imageSize = image.size();
-
-            //declares the outputs
-            Mat Output(width, height, CV_16UC3, Scalar(0,50000, 50000));
             
             //check that the rate is the specified
             if(cnt%fr==0){
-                //remaps the input
-                Mat map1, map2;
-                initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
-                remap(image, Output, map1, map2, INTER_LINEAR);
-
-                //saves the remaped frame
-                ostringstream namevidefr;
-                namevidefr << BasePath << prefix << videoname << "_" << cnt << ".jpg";
-                
-                bool save = imwrite(namevidefr.str(), Output, compression_params);
-
-                //checks if the image was saved correctly;
-                if(!(save)){
-                    cout << "video frame could not be saved" << endl;
-                    return -1;
+                //checks if a video must be written
+                if(videoyes){
+                    videowr.write(image);
                 }
+                else{
+                    //declares the outputs
+                    Mat Output(width, height, CV_16UC3, Scalar(0,50000, 50000));
+                    
+                    //remaps the input
+                    Mat map1, map2;
+                    initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
+                    remap(image, Output, map1, map2, INTER_LINEAR);
 
-                cout << "Frame " << cnt << " saved!" << endl;
+                    //saves the remaped frame
+                    ostringstream namevidefr;
+                    namevidefr << BasePath << prefix << videoname << "_" << cnt << ".jpg";
+                    
+                    bool save = imwrite(namevidefr.str(), Output, compression_params);
+
+                    //checks if the image was saved correctly;
+                    if(!(save)){
+                        cout << "video frame could not be saved" << endl;
+                        return -1;
+                    }
+                }
             }
 
             //reads the next image
@@ -318,7 +341,7 @@ int main(int argc, char* argv[]){
         ostringstream outname;
 
         outname << BasePath << prefix << imagefilename << ".jpg";
-	    //saves the calibrated frame
+        //saves the calibrated frame
         bool save = imwrite(outname.str(), Output, compression_params);
 
         //checks if it was saved correctly
