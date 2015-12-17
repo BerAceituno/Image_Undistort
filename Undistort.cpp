@@ -63,9 +63,10 @@ void help(){
     cout << "-p : Output prefix [optional] if not given set as UND" << endl;
     cout << "-r : video sampling rate [optional] if not given set as 1" << endl;
     cout << "-v : creating a video output [optional]" << endl;
+    cout << "-f : use fisheye camera model [optional]" << endl;
     cout << endl;
     cout << "example: " << endl;
-    cout << "$ ./Undistort -c CALIBRATION.xml -i VIDEO.avi -o /home/user/Documents/ -r 5 -p REMAP_ -v" << endl;            
+    cout << "$ ./Undistort -c CALIBRATION.xml -i VIDEO.avi -o /home/user/Documents/ -r 5 -p REMAP_ -v -f" << endl;            
 }
 
 int str2int(const string& str) {
@@ -113,6 +114,7 @@ int main(int argc, char* argv[]){
     string InputFilename;
     string BasePath;
     int videoyes = 0;
+    int fisheyemod = 0;
 
     //reads the inputs
     int i;
@@ -132,6 +134,7 @@ int main(int argc, char* argv[]){
         else if(argument == "-p") prefix = argval;
         else if(argument == "-r") fr = str2int(argval);
         else if(argument == "-v") videoyes = 1;
+        else if(argument == "-f") fisheyemod = 1;
     }
 
     //checks that the coefficients and the input source are given
@@ -199,9 +202,12 @@ int main(int argc, char* argv[]){
             Mat Output(width, height, CV_16UC3, Scalar(0,50000, 50000));
             
             //remaps the input
-            Mat map1, map2;
-            initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
-            remap(image, Output, map1, map2, INTER_LINEAR);
+            if(fisheyemod) fisheye::undistortImage(image, Output, cameraMatrix, distCoeffs);
+            else{
+                Mat map1, map2;
+                initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
+                remap(image, Output, map1, map2, INTER_LINEAR);
+            }
 
             //gets the name of the original file
             string fullpath = imageList[atImageList];
@@ -213,8 +219,8 @@ int main(int argc, char* argv[]){
             string filename = fullpath.substr(fullpath.find_last_of("/") + 1,fullpath.length() - extension.length());
 
             ostringstream Namefr;
-            if(filename.empty()) Namefr << prefix << fullpath << ".jpg";
-            else Namefr << BasePath << prefix << filename << ".jpg";
+            if(filename.empty()) Namefr << prefix << fullpath;
+            else Namefr << BasePath << prefix << filename;
 
             //saves the undistorted file
             bool save = imwrite(Namefr.str(), Output, compression_params);
@@ -282,20 +288,34 @@ int main(int argc, char* argv[]){
             if(cnt%fr==0){
                 //checks if a video must be written
                 if(videoyes){
-                    videowr.write(image);
+                    //declares the outputs
+                    Mat Output(width, height, CV_16UC3, Scalar(0,50000, 50000));
+                    
+                    //remaps the input
+                    if(fisheyemod) fisheye::undistortImage(image, Output, cameraMatrix, distCoeffs);
+                    else{
+                        Mat map1, map2;
+                        initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
+                        remap(image, Output, map1, map2, INTER_LINEAR);
+                    }
+
+                    videowr.write(Output);
                 }
                 else{
                     //declares the outputs
                     Mat Output(width, height, CV_16UC3, Scalar(0,50000, 50000));
                     
                     //remaps the input
-                    Mat map1, map2;
-                    initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
-                    remap(image, Output, map1, map2, INTER_LINEAR);
+                    if(fisheyemod) fisheye::undistortImage(image, Output, cameraMatrix, distCoeffs);
+                    else{
+                        Mat map1, map2;
+                        initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
+                        remap(image, Output, map1, map2, INTER_LINEAR);
+                    }
 
                     //saves the remaped frame
                     ostringstream namevidefr;
-                    namevidefr << BasePath << prefix << videoname << "_" << cnt << ".jpg";
+                    namevidefr << BasePath << prefix << videoname << "_" << cnt;
                     
                     bool save = imwrite(namevidefr.str(), Output, compression_params);
 
@@ -331,16 +351,19 @@ int main(int argc, char* argv[]){
         Mat Output(width, height, CV_16UC3, Scalar(0,50000, 50000));
         
         //remaps the input
-        Mat map1, map2;
-        initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
-        remap(image, Output, map1, map2, INTER_LINEAR);
+        if(fisheyemod) fisheye::undistortImage(image, Output, cameraMatrix, distCoeffs);
+        else{
+            Mat map1, map2;
+            initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
+            remap(image, Output, map1, map2, INTER_LINEAR);
+        }
 
         string extension = InputFilename.substr(InputFilename.find_last_of("."));
         string imagefilename = InputFilename.substr(InputFilename.find_last_of("/") + 1,InputFilename.length() - extension.length());
 
         ostringstream outname;
 
-        outname << BasePath << prefix << imagefilename << ".jpg";
+        outname << BasePath << prefix << imagefilename;
         //saves the calibrated frame
         bool save = imwrite(outname.str(), Output, compression_params);
 
