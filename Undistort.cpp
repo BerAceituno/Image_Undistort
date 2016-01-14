@@ -202,7 +202,7 @@ int main(int argc, char* argv[]){
             Mat Output(width, height, CV_16UC3, Scalar(0,50000, 50000));
             
             //remaps the input
-            if(fisheyemod) fisheye::undistortImage(image, Output, cameraMatrix, distCoeffs);
+            if(fisheyemod) cout << "testing stage" << endl; //fisheye::undistortImage(image, Output, cameraMatrix, distCoeffs);
             else{
                 Mat map1, map2;
                 initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
@@ -292,7 +292,7 @@ int main(int argc, char* argv[]){
                     Mat Output(width, height, CV_16UC3, Scalar(0,50000, 50000));
                     
                     //remaps the input
-                    if(fisheyemod) fisheye::undistortImage(image, Output, cameraMatrix, distCoeffs);
+                    if(fisheyemod) cout << "testing stage" << endl; //fisheye::undistortImage(image, Output, cameraMatrix, distCoeffs);
                     else{
                         Mat map1, map2;
                         initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
@@ -306,7 +306,7 @@ int main(int argc, char* argv[]){
                     Mat Output(width, height, CV_16UC3, Scalar(0,50000, 50000));
                     
                     //remaps the input
-                    if(fisheyemod) fisheye::undistortImage(image, Output, cameraMatrix, distCoeffs);
+                    if(fisheyemod) cout << "testing stage" << endl; //fisheye::undistortImage(image, Output, cameraMatrix, distCoeffs);
                     else{
                         Mat map1, map2;
                         initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
@@ -351,7 +351,7 @@ int main(int argc, char* argv[]){
         Mat Output(width, height, CV_16UC3, Scalar(0,50000, 50000));
         
         //remaps the input
-        if(fisheyemod) fisheye::undistortImage(image, Output, cameraMatrix, distCoeffs);
+        if(fisheyemod) cout << "testing stage" << endl; //fisheye::undistortImage(image, Output, cameraMatrix, distCoeffs);
         else{
             Mat map1, map2;
             initUndistortRectifyMap(cameraMatrix, distCoeffs, Mat(), getOptimalNewCameraMatrix(cameraMatrix, distCoeffs, imageSize, 1, imageSize, 0), imageSize, CV_16SC2, map1, map2);
