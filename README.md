@@ -64,7 +64,7 @@ And has been succesfully tested on Ubuntu 14.04 and 12.04, no GPU required.
 The software is ran via terminal by locating in the build folder and entering:
 
 ```
-  $ ./Undistort -c  <calibration parameters .xml> -i <input source> -o <output directory> -p <prefix for output files> -r <sampling rate for video files> -v -f
+  $ ./Undistort -c  <calibration parameters .xml> -i <input source> -o <output directory> -p <prefix for output files> -r <sampling rate for video files> -v
 ```
 
 where the inputs represent:
@@ -85,8 +85,6 @@ where the inputs represent:
  
   6. -v   :   (optional) generate video output.
 
-  7. -f   :   (optional) use fisheye camera model.
-  
   In the case the output directory is not created the saving process will fail.
 
 **Distributed under an MIT License**
