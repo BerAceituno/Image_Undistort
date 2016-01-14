@@ -1,6 +1,6 @@
 /*********************************************************************/
 /* File: Undistort.cpp                                               */
-/* Last Edition: 09/12/2015, 20:28 PM.                               */
+/* Last Edition: 13/01/2016, 20:51 PM.                               */
 /*********************************************************************/
 /* Programmed by:                                                    */
 /* Bernardo Aceituno C                                               */
@@ -63,10 +63,10 @@ void help(){
     cout << "-p : Output prefix [optional] if not given set as UND" << endl;
     cout << "-r : video sampling rate [optional] if not given set as 1" << endl;
     cout << "-v : creating a video output [optional]" << endl;
-    cout << "-f : use fisheye camera model [optional]" << endl;
+    //cout << "-f : use fisheye camera model [optional]" << endl;
     cout << endl;
     cout << "example: " << endl;
-    cout << "$ ./Undistort -c CALIBRATION.xml -i VIDEO.avi -o /home/user/Documents/ -r 5 -p REMAP_ -v -f" << endl;            
+    cout << "$ ./Undistort -c CALIBRATION.xml -i VIDEO.avi -o /home/user/Documents/ -r 5 -p REMAP_ -v" << endl;            
 }
 
 int str2int(const string& str) {
@@ -134,7 +134,7 @@ int main(int argc, char* argv[]){
         else if(argument == "-p") prefix = argval;
         else if(argument == "-r") fr = str2int(argval);
         else if(argument == "-v") videoyes = 1;
-        else if(argument == "-f") fisheyemod = 1;
+        //else if(argument == "-f") fisheyemod = 1;
     }
 
     //checks that the coefficients and the input source are given
